@@ -8,6 +8,12 @@ import { ApiDocsModal } from './components/ApiDocsModal';
 import { MobileBottomNav } from './components/MobileBottomNav';
 import { Item, User, CATEGORIES } from './types';
 import {
+  saveItemToFirestore,
+  updateItemInFirestore,
+  deleteItemFromFirestore,
+  trackAnalyticsEvent,
+} from './firebase';
+import {
   fetchItems,
   createItem,
   updateItem,
@@ -141,6 +147,9 @@ export const App: React.FC = () => {
       },
       currentUser?.token
     );
+    // Sync directly to Cloud Firestore collection 'items'
+    await saveItemToFirestore(created);
+    trackAnalyticsEvent('post_notice_completed', { item_name: created.name, category: created.category });
     showToast(`Notice for "${created.name}" is now live!`);
     loadItems();
   };
@@ -148,6 +157,9 @@ export const App: React.FC = () => {
   const handleUpdateItem = async (itemData: Omit<Item, 'id' | 'createdAt' | 'updatedAt'>) => {
     if (!editingItem) return;
     const updated = await updateItem(editingItem.id, itemData, currentUser?.token);
+    // Sync to Cloud Firestore
+    await updateItemInFirestore(editingItem.id, itemData);
+    trackAnalyticsEvent('update_notice', { id: editingItem.id });
     showToast(`Notice for "${updated.name}" updated!`);
     setEditingItem(null);
     if (selectedItem?.id === editingItem.id) {
@@ -158,6 +170,9 @@ export const App: React.FC = () => {
 
   const handleDeleteItem = async (id: string) => {
     await deleteItem(id, currentUser?.token);
+    // Delete from Cloud Firestore
+    await deleteItemFromFirestore(id);
+    trackAnalyticsEvent('delete_notice', { id });
     showToast('Notice withdrawn successfully.');
     setSelectedItem(null);
     loadItems();
@@ -165,6 +180,9 @@ export const App: React.FC = () => {
 
   const handleStatusChange = async (item: Item, newStatus: 'Lost' | 'Found' | 'Resolved') => {
     const updated = await updateItem(item.id, { status: newStatus }, currentUser?.token);
+    // Sync status change to Cloud Firestore
+    await updateItemInFirestore(item.id, { status: newStatus });
+    trackAnalyticsEvent('change_notice_status', { id: item.id, new_status: newStatus });
     showToast(
       newStatus === 'Resolved'
         ? `"${item.name}" marked as safely reunited!`
