@@ -1,0 +1,8 @@
+{
+  "name": "Campus Lost & Found",
+  "description": "Campus Lost & Found application to report, track, and recover lost personal items across campus.",
+  "permissions": [],
+  "capabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

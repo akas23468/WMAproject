@@ -1,0 +1,139 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 650 1020" width="100%" height="100%" style="background-color: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
+  <defs>
+    <!-- Arrowhead markers -->
+    <marker id="arrow" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#3b6998" />
+    </marker>
+    <filter id="shadow" x="-5%" y="-5%" width="110%" height="115%" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#000000" flood-opacity="0.06"/>
+    </filter>
+  </defs>
+
+  <style>
+    .node-blue { fill: #dbeafe; stroke: #4f80b5; stroke-width: 1.8; rx: 14; filter: url(#shadow); }
+    .node-yellow { fill: #fef3c7; stroke: #d97706; stroke-width: 1.8; filter: url(#shadow); }
+    .node-orange { fill: #ffedd5; stroke: #ea580c; stroke-width: 1.8; rx: 14; filter: url(#shadow); }
+    .node-pill { rx: 20; stroke-width: 1.8; filter: url(#shadow); }
+    .text-title { font-size: 13.5px; font-weight: 600; fill: #1e293b; text-anchor: middle; dominant-baseline: middle; }
+    .text-sub { font-size: 11.5px; font-weight: 500; fill: #475569; text-anchor: middle; dominant-baseline: middle; }
+    .text-branch { font-size: 12px; font-weight: 700; fill: #1e293b; }
+    .flow-line { stroke: #3b6998; stroke-width: 2; fill: none; marker-end: url(#arrow); stroke-linecap: round; stroke-linejoin: round; }
+  </style>
+
+  <!-- Title Heading -->
+  <text x="325" y="32" text-anchor="middle" font-size="16" font-weight="800" fill="#0f172a" letter-spacing="0.5">CAMPUSFIND ARCHITECTURE FLOW DIAGRAM</text>
+  <text x="325" y="50" text-anchor="middle" font-size="11.5" font-weight="600" fill="#64748b">Flutter Mobile Client • Node.js REST API • Firebase Cloud Infrastructure</text>
+
+  <!-- 1. Start Node -->
+  <g transform="translate(325, 88)">
+    <rect x="-55" y="-18" width="110" height="36" class="node-orange node-pill" />
+    <text y="1" class="text-title" font-weight="700">Start</text>
+  </g>
+
+  <!-- Flow: Start -> Launch App -->
+  <path d="M 325 106 L 325 138" class="flow-line" />
+
+  <!-- 2. Launch Flutter App -->
+  <g transform="translate(325, 165)">
+    <rect x="-115" y="-25" width="230" height="50" class="node-blue" />
+    <text y="-8" class="text-title">Launch Flutter App</text>
+    <text y="12" class="text-sub">(Firebase.initializeApp)</text>
+  </g>
+
+  <!-- Flow: Launch App -> User logged in? -->
+  <path d="M 325 190 L 325 222" class="flow-line" />
+
+  <!-- 3. Decision: User logged in? -->
+  <g transform="translate(325, 255)">
+    <polygon points="0,-28 120,0 0,28 -120,0" class="node-yellow" />
+    <text y="1" class="text-title" font-weight="700">User logged in?</text>
+  </g>
+
+  <!-- Flow: User logged in -> No branch -->
+  <path d="M 235 255 L 180 255 L 180 300" class="flow-line" />
+  <text x="192" y="247" class="text-branch">No</text>
+
+  <!-- Flow: User logged in -> Yes branch -->
+  <path d="M 325 283 L 325 390" class="flow-line" />
+  <text x="333" y="315" class="text-branch">Yes</text>
+
+  <!-- 4. Login / Register -->
+  <g transform="translate(180, 325)">
+    <rect x="-105" y="-24" width="210" height="48" class="node-blue" />
+    <text y="-7" class="text-title">Login / Register</text>
+    <text y="11" class="text-sub">(Firebase Authentication)</text>
+  </g>
+
+  <!-- Flow: Login / Register -> Send HTTP request -->
+  <path d="M 180 349 L 180 375 L 260 412" class="flow-line" />
+
+  <!-- 5. Send HTTP request to Backend API -->
+  <g transform="translate(325, 430)">
+    <rect x="-135" y="-26" width="270" height="52" class="node-blue" />
+    <text y="-8" class="text-title">Send HTTP request to Backend API</text>
+    <text y="12" class="text-sub">(GET / POST / PUT / DELETE)</text>
+  </g>
+
+  <!-- Flow: Send HTTP request -> API response successful? -->
+  <path d="M 325 456 L 325 492" class="flow-line" />
+
+  <!-- 6. Decision: API response successful? -->
+  <g transform="translate(325, 528)">
+    <polygon points="0,-32 125,0 0,32 -125,0" class="node-yellow" />
+    <text y="-6" class="text-title" font-weight="700">API response</text>
+    <text y="12" class="text-title" font-weight="700">successful?</text>
+  </g>
+
+  <!-- Flow: API successful -> No branch -->
+  <path d="M 415 528 L 475 528 L 475 605" class="flow-line" />
+  <text x="428" y="520" class="text-branch">No</text>
+
+  <!-- 7. Show error message -->
+  <g transform="translate(475, 630)">
+    <rect x="-85" y="-22" width="170" height="44" class="node-orange" />
+    <text y="1" class="text-title" fill="#7c2d12">Show error message</text>
+  </g>
+
+  <!-- Flow: Error message -> Retry Loop -->
+  <path d="M 475 652 L 475 675 L 575 675 L 575 430 L 465 430" class="flow-line" />
+  <text x="515" y="555" class="text-branch" fill="#b45309">Retry</text>
+
+  <!-- Flow: API successful -> Yes branch -->
+  <path d="M 235 528 L 205 528 L 205 600" class="flow-line" />
+  <text x="215" y="520" class="text-branch">Yes</text>
+
+  <!-- 8. Parse JSON and update UI -->
+  <g transform="translate(205, 625)">
+    <rect x="-125" y="-25" width="250" height="50" class="node-blue" />
+    <text y="-8" class="text-title">Parse JSON and update UI</text>
+    <text y="12" class="text-sub">(setState / Provider)</text>
+  </g>
+
+  <!-- Flow: Parse JSON -> Upload / Download file -->
+  <path d="M 205 650 L 205 690 L 325 715" class="flow-line" />
+
+  <!-- 9. Upload / Download file (Firebase Storage) -->
+  <g transform="translate(325, 740)">
+    <rect x="-115" y="-25" width="230" height="50" class="node-blue" />
+    <text y="-8" class="text-title">Upload / Download file</text>
+    <text y="12" class="text-sub">(Firebase Storage)</text>
+  </g>
+
+  <!-- Flow: Upload/Download -> Display data -->
+  <path d="M 325 765 L 325 802" class="flow-line" />
+
+  <!-- 10. Display data and media on screen -->
+  <g transform="translate(325, 830)">
+    <rect x="-125" y="-25" width="250" height="50" class="node-blue" />
+    <text y="1" class="text-title">Display data and media on screen</text>
+  </g>
+
+  <!-- Flow: Display data -> End -->
+  <path d="M 325 855 L 325 902" class="flow-line" />
+
+  <!-- 11. End Node -->
+  <g transform="translate(325, 925)">
+    <rect x="-55" y="-18" width="110" height="36" class="node-orange node-pill" />
+    <text y="1" class="text-title" font-weight="700">End</text>
+  </g>
+</svg>
