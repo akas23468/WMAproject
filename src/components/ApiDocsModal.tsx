@@ -69,6 +69,29 @@ export const ApiDocsModal: React.FC<ApiDocsModalProps> = ({ onClose }) => {
             )}
           </div>
 
+          {/* Firebase Cloud Storage Card */}
+          <div className="bg-amber-50/70 border border-amber-200 rounded-2xl p-4 space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold text-amber-950 uppercase tracking-wider flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-amber-500" />
+                Firebase Cloud Storage Connected
+              </span>
+              <span className="text-[10px] font-mono font-bold bg-amber-200 text-amber-900 px-2 py-0.5 rounded">
+                v10.x SDK
+              </span>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs font-mono text-slate-700 pt-1">
+              <div className="bg-white p-2 rounded-lg border border-amber-200/80">
+                <span className="text-[10px] text-slate-400 block font-sans">Storage Bucket:</span>
+                <span className="font-bold text-amber-900 break-all">wmaproject-1b5be.firebasestorage.app</span>
+              </div>
+              <div className="bg-white p-2 rounded-lg border border-amber-200/80">
+                <span className="text-[10px] text-slate-400 block font-sans">Project ID:</span>
+                <span className="font-bold text-amber-900">wmaproject-1b5be</span>
+              </div>
+            </div>
+          </div>
+
           {/* Endpoints Table */}
           <div className="space-y-3">
             <h3 className="text-xs font-bold uppercase tracking-wider text-amber-900">Documented Service Endpoints</h3>

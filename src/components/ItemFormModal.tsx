@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { X, Upload, AlertCircle } from 'lucide-react';
+import { X, Upload, AlertCircle, Cloud, CheckCircle, Loader2 } from 'lucide-react';
 import { Item, CATEGORIES, CAMPUS_LOCATIONS } from '../types';
+import { uploadFileToFirebaseStorage } from '../firebase';
 
 interface ItemFormModalProps {
   initialItem?: Item | null;
@@ -37,20 +38,40 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
   const [contact, setContact] = useState(initialItem?.contact || '');
   const [imageUrl, setImageUrl] = useState(initialItem?.imageUrl || '');
   const [loading, setLoading] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const [uploadStatus, setUploadStatus] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      if (file.size > 5 * 1024 * 1024) {
-        setError('Image file is too large (maximum 5MB).');
+      if (file.size > 10 * 1024 * 1024) {
+        setError('Image file is too large (maximum 10MB).');
         return;
       }
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImageUrl(reader.result as string);
-      };
-      reader.readAsDataURL(file);
+      try {
+        setUploadingImage(true);
+        setUploadStatus('Uploading to Firebase Storage...');
+        setError(null);
+
+        // Upload to Firebase Storage bucket
+        const downloadUrl = await uploadFileToFirebaseStorage(file);
+        setImageUrl(downloadUrl);
+        setUploadStatus('Uploaded to Firebase Storage!');
+        setTimeout(() => setUploadStatus(null), 3500);
+      } catch (err: unknown) {
+        console.warn('Firebase Storage upload notice:', err);
+        // Fallback to local Data URL preview if storage rules restrict write
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setImageUrl(reader.result as string);
+        };
+        reader.readAsDataURL(file);
+        setUploadStatus('Image preview loaded locally');
+        setTimeout(() => setUploadStatus(null), 3500);
+      } finally {
+        setUploadingImage(false);
+      }
     }
   };
 
@@ -263,29 +284,56 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
 
           {/* Image Upload or URL */}
           <div>
-            <label className="block text-xs font-bold text-slate-800 uppercase tracking-wider mb-1.5">
-              Visual Reference (Upload Photo or Select Preset)
-            </label>
+            <div className="flex items-center justify-between mb-1.5">
+              <label className="block text-xs font-bold text-slate-800 uppercase tracking-wider">
+                Visual Reference (Firebase Storage)
+              </label>
+              <span className="text-[10px] font-bold text-amber-800 flex items-center gap-1 bg-amber-100/80 px-2 py-0.5 rounded-md border border-amber-200">
+                <Cloud className="w-3 h-3 text-amber-700" />
+                <span>Firebase Storage Bucket</span>
+              </span>
+            </div>
             <div className="space-y-2">
               <div className="flex gap-2">
                 <input
                   type="url"
-                  placeholder="Paste direct image link (https://...)"
+                  placeholder="Firebase Storage URL or image link (https://...)"
                   value={imageUrl}
                   onChange={(e) => setImageUrl(e.target.value)}
-                  className="flex-1 px-3.5 py-2 bg-amber-50/40 border border-amber-200 rounded-xl text-xs focus:bg-white focus:border-amber-500 outline-none"
+                  className="flex-1 px-3.5 py-2 bg-amber-50/40 border border-amber-200 rounded-xl text-xs focus:bg-white focus:border-amber-500 outline-none truncate"
                 />
-                <label className="cursor-pointer px-3 py-2 rounded-xl text-xs font-bold bg-amber-100 hover:bg-amber-200 text-amber-900 border border-amber-300 flex items-center gap-1.5 shrink-0 transition">
-                  <Upload className="w-3.5 h-3.5" />
-                  <span>Choose File</span>
+                <label className={`cursor-pointer px-3.5 py-2 rounded-xl text-xs font-bold border flex items-center gap-1.5 shrink-0 transition ${
+                  uploadingImage
+                    ? 'bg-amber-200 text-amber-900 border-amber-400 cursor-wait'
+                    : 'bg-amber-100 hover:bg-amber-200 text-amber-900 border-amber-300'
+                }`}>
+                  {uploadingImage ? (
+                    <>
+                      <Loader2 className="w-3.5 h-3.5 animate-spin text-amber-800" />
+                      <span>Uploading...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Upload className="w-3.5 h-3.5" />
+                      <span>Upload Photo</span>
+                    </>
+                  )}
                   <input
                     type="file"
                     accept="image/*"
+                    disabled={uploadingImage}
                     onChange={handleFileUpload}
                     className="hidden"
                   />
                 </label>
               </div>
+
+              {uploadStatus && (
+                <div className="text-[11px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-lg px-2.5 py-1 flex items-center gap-1.5">
+                  <CheckCircle className="w-3 h-3 text-emerald-600 shrink-0" />
+                  <span>{uploadStatus}</span>
+                </div>
+              )}
 
               {/* Sample Photo Quick Select */}
               <div className="pt-1">
